@@ -42,5 +42,14 @@
   "emergency": {
     "general": "",
     "note": ""
-  }
+  },
+  "theme": "default",
+  "checklist": [
+    {
+      "id": "example",
+      "group": "出发前",
+      "title": "示例待办",
+      "note": "这里填写说明"
+    }
+  ]
 }

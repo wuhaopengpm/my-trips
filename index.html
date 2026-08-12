@@ -18,13 +18,29 @@
 <nav class="daystrip" id="daystrip"></nav>
 <main id="main"></main>
 </div>
+
 <nav class="bottomnav">
 <button class="navbtn active" data-view="library">旅行库</button>
 <button class="navbtn" data-view="today">当天</button>
 <button class="navbtn" data-view="orders">订单</button>
 <button class="navbtn" data-view="tools">资料</button>
 </nav>
-<div class="modal" id="orderModal"><div class="sheet"><div style="display:flex;justify-content:space-between;align-items:center"><h3 id="orderSheetTitle">添加凭证</h3><button class="btn" id="orderClose">关闭</button></div><div id="orderCurrent"></div><div class="field"><label for="orderFile">订单 / 二维码截图</label><input id="orderFile" type="file" accept="image/*"></div><div class="field"><label for="orderNote">备注</label><textarea id="orderNote" placeholder="集合点、票号、司机 WhatsApp 等"></textarea></div><div class="sheet-actions"><button class="btn primary wide" id="orderSave">保存到本机</button></div></div></div>
+
+<div class="modal" id="orderModal">
+  <div class="sheet">
+    <div style="display:flex;justify-content:space-between;align-items:center"><h3 id="orderSheetTitle">添加凭证</h3><button class="btn" id="orderClose">关闭</button></div>
+    <div id="orderCurrent"></div>
+    <div class="field"><label for="orderFile">订单 / 二维码截图</label><input id="orderFile" type="file" accept="image/*"></div>
+    <div class="field"><label for="orderNote">备注</label><textarea id="orderNote" placeholder="集合点、票号、司机 WhatsApp 等"></textarea></div>
+    <div class="sheet-actions"><button class="btn primary wide" id="orderSave">保存到本机</button></div>
+  </div>
+</div>
+
+<div class="viewer" id="imageViewer">
+  <div class="viewer-bar"><div class="viewer-title" id="viewerTitle">订单</div><button class="viewer-close" id="viewerClose">关闭</button></div>
+  <img id="viewerImg" alt="订单二维码全屏查看">
+</div>
+
 <script src="./app.js"></script>
 </body>
 </html>

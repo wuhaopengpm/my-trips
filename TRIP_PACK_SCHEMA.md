@@ -1,14 +1,15 @@
-# Trip Pack 结构
+# Trip Pack V3.2 结构
 
-以后每个城市/行程都做成一个独立 JSON 攻略包，App 不需要重装。
+以后每个城市/行程仍然是一个独立 JSON 文件。
 
-最少字段：
+新增支持字段：
 
 ```json
 {
   "id": "tokyo-2027-04",
   "city": "东京",
   "country": "日本",
+  "theme": "default",
   "meta": {
     "title": "Tokyo 6-Day",
     "subtitle": "东京 6 天旅行助手",
@@ -16,35 +17,31 @@
     "end": "2027-04-06",
     "route": "新宿 · 浅草 · 银座 · 镰仓"
   },
-  "days": [
+  "checklist": [
     {
-      "day": 1,
-      "date": "2027-04-01",
-      "label": "4月1日",
-      "title": "抵达东京",
-      "route": "NRT → 新宿",
-      "hotel": "酒店名",
-      "transport": "交通说明",
-      "booking": "预订说明",
-      "backup": "备用方案",
-      "timeline": [
-        ["15:00", "抵达成田", "入境取行李"]
-      ],
-      "places": [
-        ["Narita Airport", 35.7720, 140.3929]
-      ]
+      "id": "hotel",
+      "group": "住宿",
+      "title": "确认酒店",
+      "note": "保存确认单"
     }
   ],
-  "hotels": [],
-  "orderTemplates": [],
-  "guides": {},
-  "emergency": {
-    "general": "当地紧急电话",
-    "note": "说明"
-  }
+  "days": []
 }
 ```
 
-有两种加入方式：
-1. 内置：把 JSON 放进 `trips/`，再在 `trips.json` 增加一条记录。
-2. 手机本地导入：直接在 App 的“旅行库 → 导入新城市”选择攻略包 JSON，无需重新部署。
+## V3.2 新功能
+- 旅行库自动按：旅行中 → 即将出发 → 已结束排序
+- 出发倒计时
+- 行前 Checklist
+- “回到今天”
+- 明日准备
+- 订单二维码全屏
+- 重要订单置顶
+
+## GitHub 内置新城市
+仍然只需要：
+1. 上传 `<city>.json`
+2. 更新 `trips.json`
+3. 更新 `sw.js` 缓存清单
+
+后续可以直接让 ChatGPT 为你生成“城市升级补丁包”，无需自己编辑 JSON。

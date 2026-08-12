@@ -5,7 +5,7 @@ const state={view:'library',day:0,orderFilter:'全部'};
 const DB_NAME='MyTripsDB',DB_VER=2;
 
 function escapeHTML(s){return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
-function baliParts(date=new Date()){
+function localParts(date=new Date()){
   const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Makassar',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(date);
   const o={};parts.forEach(p=>o[p.type]=p.value);return{date:`${o.year}-${o.month}-${o.day}`,hour:+o.hour,minute:+o.minute}
 }
@@ -15,13 +15,34 @@ function fmtDelta(m){m=Math.max(0,m);const h=Math.floor(m/60),mm=m%60;return h?`
 function checksKey(){return `checks:${TRIP?.id||'none'}`}
 function loadChecks(){try{return JSON.parse(localStorage.getItem(checksKey())||'{}')}catch(e){return{}}}
 function saveChecks(v){localStorage.setItem(checksKey(),JSON.stringify(v))}
+function checklistKey(){return `checklist:${TRIP?.id||'none'}`}
+function loadChecklist(){try{return JSON.parse(localStorage.getItem(checklistKey())||'{}')}catch(e){return{}}}
+function saveChecklist(v){localStorage.setItem(checklistKey(),JSON.stringify(v))}
 function completedCount(day){const c=loadChecks();return day.timeline.reduce((n,_,i)=>n+(c[`${day.date}-${i}`]?1:0),0)}
+function checklistCount(trip=TRIP){
+  if(!trip)return{done:0,total:0};let c={};
+  try{c=JSON.parse(localStorage.getItem(`checklist:${trip.id}`)||'{}')}catch(e){}
+  const list=trip.checklist||[];return{done:list.filter(x=>c[x.id]).length,total:list.length}
+}
+function tripDates(t){return{start:t.start||t.meta?.start,end:t.end||t.meta?.end}}
+function tripState(t){
+  const {start,end}=tripDates(t),today=localParts().date;
+  if(today<start)return{kind:'upcoming',days:diffDays(today,start),rank:1};
+  if(today>end)return{kind:'past',days:diffDays(end,today),rank:3};
+  return{kind:'live',days:0,rank:0};
+}
+function stateLabel(t){
+  const s=tripState(t);
+  if(s.kind==='live')return{txt:'旅行中',cls:'live'};
+  if(s.kind==='upcoming')return{txt:s.days===0?'今天出发':`${s.days} 天后出发`,cls:'warn'};
+  return{txt:'已结束',cls:'past'}
+}
 function defaultDay(){
-  if(!TRIP)return 0;const t=baliParts().date,i=TRIP.days.findIndex(d=>d.date===t);
+  if(!TRIP)return 0;const t=localParts().date,i=TRIP.days.findIndex(d=>d.date===t);
   if(i>=0)return i;if(t<TRIP.meta.start)return 0;return TRIP.days.length-1;
 }
 function temporal(day){
-  const now=baliParts(),today=now.date,mins=now.hour*60+now.minute,start=TRIP.meta.start,end=TRIP.meta.end;
+  const now=localParts(),today=now.date,mins=now.hour*60+now.minute,start=TRIP.meta.start,end=TRIP.meta.end;
   if(today<start)return{mode:'before',days:diffDays(today,start)};
   if(today>end)return{mode:'after'};
   if(day.date!==today)return{mode:'selected'};
@@ -54,24 +75,33 @@ function importedTrips(){
   const arr=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('imported:')){try{const t=JSON.parse(localStorage.getItem(k));arr.push(t)}catch(e){}}}
   return arr;
 }
-function tripCardHTML(t, imported=false){
-  const start=t.start||t.meta?.start,end=t.end||t.meta?.end,city=t.city||'未命名城市',country=t.country||'',route=t.route||t.meta?.route||'',days=t.days?.length||t.days||'';
+function normalizedTrip(t,imported=false){
+  return {...t,_imported:imported,start:t.start||t.meta?.start,end:t.end||t.meta?.end,route:t.route||t.meta?.route||'',dayCount:Array.isArray(t.days)?t.days.length:t.days}
+}
+function tripCardHTML(t){
+  const city=t.city||'未命名城市',country=t.country||'',sl=stateLabel(t),theme=t.theme||'default';
+  const cl=checklistCount(t);
   return `<section class="card trip-card">
-    <div class="trip-cover"><div><div class="trip-country">${escapeHTML(country)}</div><div class="trip-city">${escapeHTML(city)}</div></div>
-      <div class="trip-cover-bottom"><div class="trip-dates">${start} → ${end}</div><span class="pill" style="background:rgba(255,255,255,.16);color:#fff">${days} DAYS</span></div></div>
-    <div class="trip-body"><p>${escapeHTML(route)}</p><div class="trip-actions"><button class="btn primary open-trip" data-id="${escapeHTML(t.id)}" data-imported="${imported?'1':'0'}">打开攻略</button>${imported?`<button class="btn danger delete-import" data-id="${escapeHTML(t.id)}">删除导入</button>`:''}</div></div>
+    <div class="trip-cover ${escapeHTML(theme)}"><div><div class="trip-country">${escapeHTML(country)}</div><div class="trip-city">${escapeHTML(city)}</div></div>
+      <div class="trip-cover-bottom"><div class="trip-dates">${t.start} → ${t.end}</div><span class="pill" style="background:rgba(255,255,255,.17);color:#fff">${t.dayCount} DAYS</span></div></div>
+    <div class="trip-body">
+      <div class="trip-statusline"><span class="pill ${sl.cls}">${sl.txt}</span>${cl.total?`<span class="hint">行前 ${cl.done}/${cl.total}</span>`:''}</div>
+      <p>${escapeHTML(t.route)}</p>
+      <div class="trip-actions"><button class="btn primary open-trip" data-id="${escapeHTML(t.id)}" data-imported="${t._imported?'1':'0'}">打开攻略</button>${t._imported?`<button class="btn danger delete-import" data-id="${escapeHTML(t.id)}">删除导入</button>`:''}</div>
+    </div>
   </section>`;
 }
 function renderLibrary(){
   renderDayStrip(false);TRIP=null;renderHeader();
-  const builtin=INDEX.trips, imported=importedTrips();
-  const upcoming=builtin.filter(t=>t.end>=baliParts().date).length+imported.filter(t=>t.meta?.end>=baliParts().date).length;
-  $('#main').innerHTML=`<section class="card hero"><span class="pill">TRIP LIBRARY</span><h2>我的旅行</h2><div class="route">一个 App 管理所有城市攻略。每趟旅行都是独立“攻略包”，订单、完成状态和离线数据互不干扰。</div></section>
-    <div class="stats"><div class="stat"><b>${builtin.length+imported.length}</b><span>旅行攻略</span></div><div class="stat"><b>${upcoming}</b><span>即将出发</span></div><div class="stat"><b>${imported.length}</b><span>本机导入</span></div></div>
-    <div class="section-head"><h3>攻略库</h3><span class="hint">以后新城市都放这里</span></div>
-    <div id="tripCards">${builtin.map(t=>tripCardHTML(t,false)).join('')}${imported.map(t=>tripCardHTML(t,true)).join('')}</div>
+  const all=[...INDEX.trips.map(t=>normalizedTrip(t,false)),...importedTrips().map(t=>normalizedTrip(t,true))];
+  all.sort((a,b)=>{const sa=tripState(a),sb=tripState(b);if(sa.rank!==sb.rank)return sa.rank-sb.rank;if(sa.kind==='upcoming')return a.start.localeCompare(b.start);return b.end.localeCompare(a.end)});
+  const upcoming=all.filter(t=>tripState(t).kind==='upcoming').length,live=all.filter(t=>tripState(t).kind==='live').length;
+  $('#main').innerHTML=`<section class="card hero"><span class="pill">TRIP LIBRARY</span><h2>我的旅行</h2><div class="route">旅行中优先、即将出发按日期排序。每趟旅行的行程、订单、Checklist 和离线资料独立保存。</div></section>
+    <div class="stats"><div class="stat"><b>${all.length}</b><span>旅行攻略</span></div><div class="stat"><b>${live}</b><span>旅行中</span></div><div class="stat"><b>${upcoming}</b><span>即将出发</span></div></div>
+    <div class="section-head"><h3>攻略库</h3><span class="hint">自动按状态排序</span></div>
+    <div id="tripCards">${all.map(tripCardHTML).join('')}</div>
     <div class="section-head"><h3>导入新城市</h3><span class="hint">无需重装 App</span></div>
-    <div class="import-box"><h4>导入攻略包 JSON</h4><p>以后你让我生成东京、香港、京都等攻略时，我可以直接给你一个攻略包 JSON。你在这里选择文件，就能加入这个 App。</p>
+    <div class="import-box"><h4>导入攻略包 JSON</h4><p>以后东京、香港、京都等攻略可以直接作为 JSON 导入到本机。</p>
       <label class="btn primary filebtn">选择攻略包<input id="tripImport" type="file" accept=".json,application/json"></label></div>`;
   $$('.open-trip').forEach(b=>b.addEventListener('click',()=>{const id=b.dataset.id;if(b.dataset.imported==='1')openImportedTrip(id);else{const ref=INDEX.trips.find(x=>x.id===id);if(ref)openTripByRef(ref)}}));
   $$('.delete-import').forEach(b=>b.addEventListener('click',()=>{if(confirm('删除这个本机导入的攻略？')){localStorage.removeItem(`imported:${b.dataset.id}`);renderLibrary()}}));
@@ -97,12 +127,26 @@ function smartCard(day){
   <div class="smart-grid"><div class="smart-mini"><b>完成进度</b><span>${done}/${total}</span></div><div class="smart-mini"><b>${rLabel}</b><span>${escapeHTML(r)}</span></div></div>
   <div class="progress-wrap"><div class="progress-head"><span>Day ${day.day} 完成度</span><span>${pct}%</span></div><div class="progress"><i style="width:${pct}%"></i></div></div></section>`;
 }
+function tomorrowCard(){
+  if(!TRIP)return'';
+  const idx=state.day+1;if(idx>=TRIP.days.length)return'';
+  const d=TRIP.days[idx],items=d.timeline.slice(0,3);
+  return `<section class="card tomorrow"><div class="section-head" style="margin:0 0 6px"><h3 style="font-size:16px">明天提前准备</h3><span class="hint">Day ${d.day} · ${d.label}</span></div>
+    <div class="route">${d.title}<br><strong>住宿：</strong>${d.hotel}<br><strong>预订：</strong>${d.booking}</div>
+    <div class="tomorrow-grid">${items.map(x=>`<div class="tomorrow-item"><b>${x[0]} ${x[1]}</b><span>${x[2]}</span></div>`).join('')}</div></section>`;
+}
+function goToday(){
+  state.day=defaultDay();state.view='today';render();
+}
 function renderToday(){
-  renderDayStrip(true);const d=TRIP.days[state.day],checks=loadChecks(),t=temporal(d);
-  $('#main').innerHTML=smartCard(d)+`<section class="card hero"><span class="pill">${TRIP.city} · DAY ${d.day}</span><h2>${d.title}</h2><div class="route">${d.route}</div>
+  renderDayStrip(true);const d=TRIP.days[state.day],checks=loadChecks(),t=temporal(d),realDay=defaultDay();
+  $('#main').innerHTML=`<div class="quickrow"><button class="btn soft" id="goLibrary">← 旅行库</button><button class="btn ${state.day===realDay?'primary':'soft'}" id="goToday">◎ 回到今天</button><button class="btn soft" id="goChecklist">✓ 行前 Checklist</button></div>`+
+    smartCard(d)+`<section class="card hero"><span class="pill">${TRIP.city} · DAY ${d.day}</span><h2>${d.title}</h2><div class="route">${d.route}</div>
     <div class="meta-grid"><div class="meta"><b>住宿</b><span>${d.hotel}</span></div><div class="meta"><b>交通</b><span>${d.transport}</span></div><div class="meta"><b>预订</b><span>${d.booking}</span></div><div class="meta"><b>时间点</b><span>${d.timeline.length} 个</span></div></div></section>
-    <div class="notice"><b>备用方案</b>${d.backup}</div><div class="section-head"><h3>当天时间轴</h3><span class="hint">点击圆圈标记完成</span></div><section class="card timeline" id="timeline"></section>
+    <div class="notice"><b>备用方案</b>${d.backup}</div>${tomorrowCard()}
+    <div class="section-head"><h3>当天时间轴</h3><span class="hint">点击圆圈标记完成</span></div><section class="card timeline" id="timeline"></section>
     <div class="section-head"><h3>地点与导航</h3><span class="hint">坐标可离线查看</span></div><section class="card" id="places"></section>`;
+  $('#goLibrary').addEventListener('click',()=>setView('library'));$('#goToday').addEventListener('click',goToday);$('#goChecklist').addEventListener('click',()=>setView('tools'));
   let current=-1;if(['live','day-done'].includes(t.mode))current=t.current;
   d.timeline.forEach((x,i)=>{const key=`${d.date}-${i}`,done=!!checks[key],row=document.createElement('div');row.className='item'+(i===current?' current':'');row.innerHTML=`<div class="time">${x[0]}</div><button class="check ${done?'done':''}"></button><div class="item-body ${done?'done':''}">${i===current?'<div class="current-tag">现在 / 最近一项</div>':''}<h4>${x[1]}</h4><p>${x[2]}</p></div>`;row.querySelector('.check').addEventListener('click',()=>{checks[key]=!checks[key];saveChecks(checks);renderToday()});$('#timeline').appendChild(row)});
   d.places.forEach(([name,lat,lng])=>{const div=document.createElement('div');div.className='place';div.innerHTML=`<div><div class="place-name">${name}</div><div class="coords">${lat}, ${lng}</div></div><div class="actions"><a class="btn" href="https://maps.apple.com/?q=${encodeURIComponent(name)}&ll=${lat},${lng}" target="_blank">Apple 地图</a><a class="btn" href="https://www.google.com/maps/search/?api=1&query=${lat},${lng}" target="_blank">Google Maps</a></div>`;$('#places').appendChild(div)})
@@ -118,26 +162,47 @@ async function getOrders(){const db=await openDB();return new Promise((res,rej)=
 async function putOrder(v){const db=await openDB();return new Promise((res,rej)=>{const r=db.transaction('orders','readwrite').objectStore('orders').put(v);r.onsuccess=()=>res();r.onerror=()=>rej(r.error)})}
 async function delOrder(key){const db=await openDB();return new Promise((res,rej)=>{const r=db.transaction('orders','readwrite').objectStore('orders').delete(key);r.onsuccess=()=>res();r.onerror=()=>rej(r.error)})}
 function readFile(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(r.error);r.readAsDataURL(file)})}
+function openViewer(title,image){
+  $('#viewerTitle').textContent=title;$('#viewerImg').src=image;$('#imageViewer').classList.add('open');
+}
 async function renderOrders(){
   renderDayStrip(false);const all=await getOrders().catch(()=>[]),saved=all.filter(x=>x.tripId===TRIP.id),map=new Map(saved.map(x=>[x.orderId,x]));
   const templates=TRIP.orderTemplates||[],types=['全部',...new Set(templates.map(x=>x.type))];
-  $('#main').innerHTML=`<section class="card hero"><span class="pill">${TRIP.city} · OFFLINE WALLET</span><h2>订单与二维码</h2><div class="route">每个城市的订单独立保存，不会互相混在一起。</div></section><div class="order-filter">${types.map(t=>`<button class="filter ${t===state.orderFilter?'active':''}" data-type="${t}">${t}</button>`).join('')}</div><div id="orders"></div>`;
+  $('#main').innerHTML=`<section class="card hero"><span class="pill">${TRIP.city} · OFFLINE WALLET</span><h2>订单与二维码</h2><div class="route">点订单截图可全屏放大；重要订单可置顶。</div></section><div class="order-filter">${types.map(t=>`<button class="filter ${t===state.orderFilter?'active':''}" data-type="${t}">${t}</button>`).join('')}</div><div id="orders"></div>`;
   $$('.filter').forEach(b=>b.addEventListener('click',()=>{state.orderFilter=b.dataset.type;renderOrders()}));
-  templates.filter(t=>state.orderFilter==='全部'||t.type===state.orderFilter).forEach(t=>{const s=map.get(t.id),c=document.createElement('section');c.className='card order-card';c.innerHTML=`<div class="order-head"><div><div class="order-type">${t.type}</div><h4>${t.title}</h4><div class="order-status">${s?'已保存到本机':'尚未添加'}</div></div><button class="btn edit">${s?'编辑':'添加'}</button></div>${s?.image?`<div class="order-preview"><img src="${s.image}" alt="${t.title}"></div>`:''}${s?.note?`<div class="order-note">${escapeHTML(s.note)}</div>`:''}${s?`<div class="actions" style="margin-top:10px"><button class="btn danger del">删除本机副本</button></div>`:''}`;c.querySelector('.edit').addEventListener('click',()=>openOrderSheet(t,s));const d=c.querySelector('.del');if(d)d.addEventListener('click',async()=>{if(confirm('删除这个本机凭证？')){await delOrder(`${TRIP.id}:${t.id}`);renderOrders()}});$('#orders').appendChild(c)})
+  const list=templates.filter(t=>state.orderFilter==='全部'||t.type===state.orderFilter);
+  list.sort((a,b)=>(map.get(b.id)?.pinned?1:0)-(map.get(a.id)?.pinned?1:0));
+  list.forEach(t=>{const s=map.get(t.id),c=document.createElement('section');c.className='card order-card'+(s?.pinned?' pinned':'');c.innerHTML=`<div class="order-head"><div><div class="order-type">${t.type}${s?.pinned?' · ★ 重要':''}</div><h4>${t.title}</h4><div class="order-status">${s?'已保存到本机':'尚未添加'}</div></div><button class="btn edit">${s?'编辑':'添加'}</button></div>${s?.image?`<div class="order-preview" title="点按全屏"><img src="${s.image}" alt="${t.title}"></div>`:''}${s?.note?`<div class="order-note">${escapeHTML(s.note)}</div>`:''}${s?`<div class="actions" style="margin-top:10px"><button class="btn soft pin">${s.pinned?'取消置顶':'★ 设为重要'}</button><button class="btn danger del">删除本机副本</button></div>`:''}`;
+    c.querySelector('.edit').addEventListener('click',()=>openOrderSheet(t,s));
+    const prev=c.querySelector('.order-preview');if(prev)prev.addEventListener('click',()=>openViewer(t.title,s.image));
+    const pin=c.querySelector('.pin');if(pin)pin.addEventListener('click',async()=>{await putOrder({...s,pinned:!s.pinned});renderOrders()});
+    const d=c.querySelector('.del');if(d)d.addEventListener('click',async()=>{if(confirm('删除这个本机凭证？')){await delOrder(`${TRIP.id}:${t.id}`);renderOrders()}});
+    $('#orders').appendChild(c)})
 }
 function openOrderSheet(t,s){
-  $('#orderModal').classList.add('open');$('#orderSheetTitle').textContent=t.title;$('#orderNote').value=s?.note||'';$('#orderFile').value='';$('#orderCurrent').innerHTML=s?.image?`<div class="order-preview"><img src="${s.image}"></div>`:'<div class="hint">未保存图片</div>';
-  $('#orderSave').onclick=async()=>{const f=$('#orderFile').files[0];let image=s?.image||'';if(f){if(f.size>6*1024*1024){alert('请选择 6MB 以下截图');return}image=await readFile(f)}await putOrder({key:`${TRIP.id}:${t.id}`,tripId:TRIP.id,orderId:t.id,image,note:$('#orderNote').value.trim(),updatedAt:Date.now()});$('#orderModal').classList.remove('open');renderOrders()}
+  $('#orderModal').classList.add('open');$('#orderSheetTitle').textContent=t.title;$('#orderNote').value=s?.note||'';$('#orderFile').value='';$('#orderCurrent').innerHTML=s?.image?`<div class="order-preview" id="sheetPreview"><img src="${s.image}"></div>`:'<div class="hint">未保存图片</div>';
+  const sp=$('#sheetPreview');if(sp)sp.addEventListener('click',()=>openViewer(t.title,s.image));
+  $('#orderSave').onclick=async()=>{const f=$('#orderFile').files[0];let image=s?.image||'';if(f){if(f.size>6*1024*1024){alert('请选择 6MB 以下截图');return}image=await readFile(f)}await putOrder({key:`${TRIP.id}:${t.id}`,tripId:TRIP.id,orderId:t.id,image,note:$('#orderNote').value.trim(),pinned:s?.pinned||false,updatedAt:Date.now()});$('#orderModal').classList.remove('open');renderOrders()}
 }
 function contactsKey(){return `contacts:${TRIP.id}`}
 function loadContacts(){try{return JSON.parse(localStorage.getItem(contactsKey())||'{}')}catch(e){return{}}}
 function saveContacts(c){localStorage.setItem(contactsKey(),JSON.stringify(c))}
+function renderChecklist(){
+  const list=TRIP.checklist||[],doneMap=loadChecklist(),groups=[...new Set(list.map(x=>x.group||'其他'))],cnt=checklistCount();
+  const pct=cnt.total?Math.round(cnt.done/cnt.total*100):0;
+  return `<div class="section-head"><h3>行前 Checklist</h3><span class="hint">本机自动保存</span></div>
+    <section class="card"><div class="checklist-summary"><div><div class="checklist-num">${cnt.done}/${cnt.total}</div><div class="route">出发前准备完成</div></div><span class="pill">${pct}%</span></div>
+    ${groups.map(g=>`<div class="checkgroup"><div class="checkgroup-title">${g}</div>${list.filter(x=>(x.group||'其他')===g).map(x=>`<div class="checkrow ${doneMap[x.id]?'done':''}"><button class="check ${doneMap[x.id]?'done':''}" data-checkid="${x.id}"></button><div><h4>${x.title}</h4><p>${x.note||''}</p></div></div>`).join('')}</div>`).join('')||'<div class="route">这个攻略包暂时没有 Checklist。</div>'}
+    </section>`;
+}
 function renderTools(){
   renderDayStrip(false);const contacts=loadContacts(),guides=TRIP.guides||{};
-  $('#main').innerHTML=`<section class="card emergency"><span class="pill" style="background:#f9e7e3;color:#a64035">${TRIP.city} · EMERGENCY</span><div class="emergency-num">${TRIP.emergency?.general||'—'}</div><div class="route">${TRIP.emergency?.note||'请提前保存当地紧急电话。'}</div>
+  $('#main').innerHTML=`${renderChecklist()}
+  <section class="card emergency"><span class="pill" style="background:#f9e7e3;color:#a64035">${TRIP.city} · EMERGENCY</span><div class="emergency-num">${TRIP.emergency?.general||'—'}</div><div class="route">${TRIP.emergency?.note||'请提前保存当地紧急电话。'}</div>
   <div>${[['driver','司机'],['hotel','酒店'],['insurance','保险'],['consulate','领馆']].map(([k,n])=>`<div class="contact-row"><b>${n}</b><input data-key="${k}" value="${escapeHTML(contacts[k]||'')}" placeholder="填写后本机保存"></div>`).join('')}</div></section>
   ${Object.entries(guides).map(([k,v])=>`<div class="section-head"><h3>${k}</h3></div><section class="card"><ul class="guide-list">${v.map(x=>`<li>${x}</li>`).join('')}</ul></section>`).join('')}
   <section class="card"><button class="btn wide" id="backLibrary">← 返回旅行库</button></section>`;
+  $$('#main [data-checkid]').forEach(b=>b.addEventListener('click',()=>{const c=loadChecklist();c[b.dataset.checkid]=!c[b.dataset.checkid];saveChecklist(c);renderTools()}));
   $$('#main .contact-row input').forEach(inp=>inp.addEventListener('change',()=>{const c=loadContacts();c[inp.dataset.key]=inp.value.trim();saveContacts(c)}));$('#backLibrary').addEventListener('click',()=>setView('library'))
 }
 function render(){
@@ -154,9 +219,18 @@ async function init(){
   $$('.navbtn').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.view)));
   $('#orderClose').addEventListener('click',()=>$('#orderModal').classList.remove('open'));
   $('#orderModal').addEventListener('click',e=>{if(e.target.id==='orderModal')e.currentTarget.classList.remove('open')});
+  $('#viewerClose').addEventListener('click',()=>$('#imageViewer').classList.remove('open'));
+  $('#imageViewer').addEventListener('click',e=>{if(e.target.id==='imageViewer')e.currentTarget.classList.remove('open')});
   window.addEventListener('online',renderHeader);window.addEventListener('offline',renderHeader);
-  const last=localStorage.getItem('lastTripId');
-  if(last){const ref=INDEX.trips.find(x=>x.id===last);if(ref){try{TRIP=await fetch(ref.data).then(r=>r.json());state.day=defaultDay();state.view='today'}catch(e){}}else if(localStorage.getItem(`imported:${last}`)){TRIP=JSON.parse(localStorage.getItem(`imported:${last}`));state.day=defaultDay();state.view='today'}}
+
+  // Only auto-open a trip when it is actively happening. Otherwise start at the library.
+  const candidates=[...INDEX.trips.map(t=>normalizedTrip(t,false)),...importedTrips().map(t=>normalizedTrip(t,true))];
+  const active=candidates.find(t=>tripState(t).kind==='live');
+  if(active){
+    if(active._imported){TRIP=JSON.parse(localStorage.getItem(`imported:${active.id}`))}
+    else{const ref=INDEX.trips.find(x=>x.id===active.id);try{TRIP=await fetch(ref.data).then(r=>r.json())}catch(e){}}
+    if(TRIP){state.day=defaultDay();state.view='today'}
+  }
   render();
   setInterval(()=>{if(state.view==='today'&&TRIP)renderToday()},60000);
   if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});

@@ -13,7 +13,8 @@
       "days": 7,
       "route": "南部海岸 · 佩妮达双线 · 乌布",
       "data": "./bali-2026-09.json",
-      "status": "upcoming"
+      "status": "upcoming",
+      "theme": "tropical"
     }
   ]
 }

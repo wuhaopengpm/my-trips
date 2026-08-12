@@ -912,5 +912,104 @@
   "country": "印度尼西亚",
   "cover": "BALI",
   "status": "upcoming",
-  "accent": "tropical"
+  "accent": "tropical",
+  "theme": "tropical",
+  "checklist": [
+    {
+      "id": "hotel-all",
+      "group": "住宿",
+      "title": "确认 6 晚酒店均已预订",
+      "note": "优先可免费取消；佩妮达两晚同一家。"
+    },
+    {
+      "id": "boat",
+      "group": "交通",
+      "title": "预订 Sanur ↔ 佩妮达往返快船",
+      "note": "确认往返港口、船次、行李和改签规则。"
+    },
+    {
+      "id": "penida-driver",
+      "group": "交通",
+      "title": "确认佩妮达两天同一位私人司机",
+      "note": "写清东西线、车型、酒店接送和费用。"
+    },
+    {
+      "id": "south-driver",
+      "group": "交通",
+      "title": "确认南部包车与接机",
+      "note": "DPS → Melasti → Timbis → Seminyak。"
+    },
+    {
+      "id": "airport-driver",
+      "group": "交通",
+      "title": "确认 9/17 凌晨乌布 → DPS 车辆",
+      "note": "03:45 出发，司机电话离线保存。"
+    },
+    {
+      "id": "paragliding",
+      "group": "项目",
+      "title": "确认 Timbis 滑翔伞订单",
+      "note": "取消政策、保险、GoPro、体重限制。"
+    },
+    {
+      "id": "surf",
+      "group": "项目",
+      "title": "确认 Kuta 一对一冲浪课",
+      "note": "最终时间服从潮汐和浪况。"
+    },
+    {
+      "id": "kecak",
+      "group": "项目",
+      "title": "购买 Uluwatu Kecak 18:00 场",
+      "note": "保存二维码和换票说明。"
+    },
+    {
+      "id": "spa",
+      "group": "项目",
+      "title": "预约乌布 Spa",
+      "note": "建议 9/15 18:00，90 分钟。"
+    },
+    {
+      "id": "voa",
+      "group": "入境",
+      "title": "准备 e-VOA / VOA",
+      "note": "出发前重新核对中国护照适用资格。"
+    },
+    {
+      "id": "all-indonesia",
+      "group": "入境",
+      "title": "填写 All Indonesia",
+      "note": "抵达前 3 天内填写，二维码离线保存。"
+    },
+    {
+      "id": "love-bali",
+      "group": "入境",
+      "title": "完成 Love Bali 旅游税",
+      "note": "保存付款凭证和二维码。"
+    },
+    {
+      "id": "insurance",
+      "group": "安全",
+      "title": "旅行保险与紧急电话离线保存",
+      "note": "包含保险公司、酒店、司机和领馆联系方式。"
+    },
+    {
+      "id": "offline-map",
+      "group": "手机",
+      "title": "下载巴厘岛离线地图",
+      "note": "Apple Maps / Google Maps 至少准备一套。"
+    },
+    {
+      "id": "orders",
+      "group": "手机",
+      "title": "把所有订单二维码导入 My Trips",
+      "note": "酒店、快船、Kecak、滑翔伞、签证等。"
+    },
+    {
+      "id": "power",
+      "group": "行李",
+      "title": "充电宝 / 转换插头 / 防水袋",
+      "note": "出发前最后一次检查随身电子设备。"
+    }
+  ]
 }

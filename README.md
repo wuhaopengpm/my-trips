@@ -1,64 +1,17 @@
-# My Trips V3.1 — GitHub Pages 版
+# My Trips V3.2 — GitHub Pages 版
 
-这是专门为 GitHub 网页上传优化的多城市旅行 PWA。
+## 本次升级
+- 旅行库自动排序：旅行中 → 即将出发 → 已结束
+- 城市卡显示出发倒计时
+- 巴厘岛卡片增加热带视觉
+- “回到今天”快捷按钮
+- 当天页面显示“明天提前准备”
+- 行前 Checklist，可打勾并保存
+- 订单截图点击全屏查看二维码
+- 订单可标记“重要”并自动置顶
+- 非旅行期间默认打开“旅行库”，不会每次自动跳入巴厘岛
 
-## 目录结构
+## 升级 GitHub
+如果已经部署 V3.1，只需用 V3.2 Patch 中的文件覆盖仓库同名文件并 Commit。
 
-所有城市攻略 JSON 都放在仓库根目录：
-
-```text
-my-trips/
-├── index.html
-├── app.js
-├── styles.css
-├── trips.json
-├── manifest.webmanifest
-├── sw.js
-├── icon-192.png
-├── icon-512.png
-├── bali-2026-09.json
-├── trip-pack-template.json
-├── TRIP_PACK_SCHEMA.md
-└── README.md
-```
-
-以后新增东京，只需要增加：
-
-```text
-tokyo-2027-04.json
-```
-
-并在 `trips.json` 里增加一条：
-
-```json
-{
-  "id": "tokyo-2027-04",
-  "city": "东京",
-  "country": "日本",
-  "start": "2027-04-01",
-  "end": "2027-04-06",
-  "days": 6,
-  "route": "新宿 · 浅草 · 银座",
-  "data": "./tokyo-2027-04.json",
-  "status": "upcoming"
-}
-```
-
-## GitHub Pages
-
-仓库建议：
-- repository: `my-trips`
-- branch: `main`
-- Pages source: Deploy from a branch
-- folder: `/ (root)`
-
-发布地址形式：
-
-`https://你的用户名.github.io/my-trips/`
-
-## iPhone
-
-Safari 打开 GitHub Pages 地址：
-分享 → 添加到主屏幕。
-
-首次联网完整打开后，Service Worker 会缓存核心文件。
+GitHub Pages 会自动重新部署。
