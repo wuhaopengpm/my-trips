@@ -1,0 +1,19 @@
+{
+  "app": {
+    "name": "My Trips",
+    "subtitle": "离线旅行攻略助手"
+  },
+  "trips": [
+    {
+      "id": "bali-2026-09",
+      "city": "巴厘岛",
+      "country": "印度尼西亚",
+      "start": "2026-09-11",
+      "end": "2026-09-17",
+      "days": 7,
+      "route": "南部海岸 · 佩妮达双线 · 乌布",
+      "data": "./bali-2026-09.json",
+      "status": "upcoming"
+    }
+  ]
+}

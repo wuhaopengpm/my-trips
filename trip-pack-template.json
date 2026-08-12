@@ -1,0 +1,46 @@
+{
+  "id": "city-yyyy-mm",
+  "city": "城市名",
+  "country": "国家",
+  "meta": {
+    "title": "City Trip",
+    "subtitle": "离线旅行助手",
+    "start": "2027-01-01",
+    "end": "2027-01-03",
+    "route": "路线摘要"
+  },
+  "days": [
+    {
+      "day": 1,
+      "date": "2027-01-01",
+      "label": "1月1日",
+      "title": "Day 1 标题",
+      "route": "A → B",
+      "hotel": "酒店",
+      "transport": "交通",
+      "booking": "预订",
+      "backup": "备用方案",
+      "timeline": [
+        [
+          "09:00",
+          "第一站",
+          "说明"
+        ]
+      ],
+      "places": [
+        [
+          "Place",
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "hotels": [],
+  "orderTemplates": [],
+  "guides": {},
+  "emergency": {
+    "general": "",
+    "note": ""
+  }
+}
