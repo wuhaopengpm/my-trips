@@ -265,3 +265,26 @@ body{background:radial-gradient(circle at 18% 0%,rgba(224,236,229,.75),transpare
 .stat-card strong{
   font-size:22px !important;
 }
+
+
+/* V3.6.5: make trip library cover use the same composition as detail page hero */
+.trip-library-card .trip-cover,
+.trip-card .trip-cover,
+.library-cover,
+.trip-cover.has-photo{
+  background-size: cover !important;
+  background-position: center 62% !important;
+  aspect-ratio: 16 / 9 !important;
+  min-height: unset !important;
+  height: auto !important;
+}
+
+@media(max-width:520px){
+  .trip-library-card .trip-cover,
+  .trip-card .trip-cover,
+  .library-cover,
+  .trip-cover.has-photo{
+    aspect-ratio: 16 / 9 !important;
+    background-position: center 62% !important;
+  }
+}

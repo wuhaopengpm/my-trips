@@ -1,4 +1,4 @@
-const CACHE='my-trips-v3-6-4-merged-bali-cover-20260814';
+const CACHE='my-trips-v3-6-5-library-cover-20260814';
 const CORE=[
   './',
   './index.html',
