@@ -233,3 +233,35 @@ body{background:radial-gradient(circle at 18% 0%,rgba(224,236,229,.75),transpare
   .trip-cover{min-height:210px}
   .trip-city{font-size:34px}
 }
+
+
+/* V3.6.1 Kelingking composition tuning */
+.trip-cover.has-photo{
+  min-height:300px;
+  background-position:center 72% !important;
+}
+.trip-cover{
+  background-position:center 72%;
+}
+.trip-cover .trip-city{
+  text-shadow:0 3px 20px rgba(0,0,0,.35);
+}
+@media(max-width:520px){
+  .trip-cover.has-photo{
+    min-height:230px;
+    border-radius:22px 22px 0 0;
+    background-position:center 72% !important;
+  }
+}
+
+/* Compact statistic cards */
+.stats-grid,.stat-grid{
+  gap:10px !important;
+}
+.stat-card{
+  min-height:72px !important;
+  padding:14px 12px !important;
+}
+.stat-card strong{
+  font-size:22px !important;
+}

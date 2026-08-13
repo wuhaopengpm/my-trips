@@ -45,3 +45,27 @@
 3. 更新 `sw.js` 缓存清单
 
 后续可以直接让 ChatGPT 为你生成“城市升级补丁包”，无需自己编辑 JSON。
+
+
+## V3.3 Finance
+```json
+"finance": {
+  "baseCurrency": "IDR",
+  "homeCurrency": "CNY",
+  "planningRate": 2250,
+  "rateLabel": "1 CNY = 2,250 IDR",
+  "budgetRange": {"minIDR":25400000,"maxIDR":38900000,"minCNY":11300,"maxCNY":17300}
+}
+```
+
+
+## V3.4 地图要求
+无需新增专门地图字段。地图直接使用每天已有的：
+
+```json
+"places": [
+  ["Place Name", -8.74817, 115.16717]
+]
+```
+
+经纬度必须是真实坐标。每个 Day 的 `places` 顺序即当天路线连接顺序。

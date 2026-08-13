@@ -1039,6 +1039,8 @@
     ]
   },
   "coverImage": "./bali-kelingking.jpg",
-  "coverPosition": "center 54%",
-  "coverCredit": "Kelingking Beach · Chainwit / Wikimedia Commons · CC BY 4.0"
+  "coverPosition": "center 62%",
+  "coverCredit": "Kelingking Beach Sunset",
+  "dayCoverImage": "./bali-kelingking.jpg",
+  "dayCoverPosition": "center 62%"
 }

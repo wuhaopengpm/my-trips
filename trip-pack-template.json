@@ -51,5 +51,20 @@
       "title": "示例待办",
       "note": "这里填写说明"
     }
-  ]
+  ],
+  "finance": {
+    "baseCurrency": "LOCAL",
+    "homeCurrency": "CNY",
+    "planningRate": 1,
+    "rateLabel": "1 CNY = ? LOCAL",
+    "budgetRange": {},
+    "categories": [
+      "住宿",
+      "交通",
+      "餐饮",
+      "门票/项目",
+      "购物",
+      "其他"
+    ]
+  }
 }
