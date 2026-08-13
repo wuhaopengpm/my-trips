@@ -184,3 +184,52 @@ body{background:radial-gradient(circle at 18% 0%,rgba(224,236,229,.75),transpare
 .bottomnav{background:rgba(255,255,255,.9);padding:7px;gap:3px;border-color:rgba(210,211,205,.8);border-radius:22px;box-shadow:0 14px 42px rgba(22,36,30,.16)}
 .navbtn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:7px 2px;font-size:9px;border-radius:15px}.nav-icon{font-size:16px;line-height:1;font-weight:500}.navbtn.active{background:#18231e;color:#fff}
 @media(max-width:520px){.brand{font-size:27px}.trip-cover{min-height:250px}.trip-city{font-size:38px}.scenic-hero{min-height:315px;padding:17px}.scenic-copy h2{font-size:29px}.bottomnav{width:calc(100% - 14px);bottom:calc(env(safe-area-inset-bottom) + 5px)}}
+
+/* V3.6 travel editorial layout */
+.stats{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin:14px 0 28px;
+}
+.stat{
+  min-height:72px;
+  padding:14px 14px;
+  border-radius:20px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  background:rgba(255,255,255,.96);
+  border:1px solid rgba(220,220,214,.8);
+  box-shadow:0 8px 26px rgba(20,35,28,.05);
+}
+.stat b{font-size:26px;line-height:1.1;color:#18231e}
+.stat span{font-size:12px;color:#737b76;margin-top:5px}
+.trip-cover{
+  min-height:270px;
+  border-radius:24px 24px 0 0;
+}
+.trip-cover.has-photo{
+  background-position:center 58%;
+}
+.trip-city{
+  font-size:42px;
+}
+.trip-body{
+  padding:15px 18px 18px;
+}
+.trip-route-copy{
+  margin:8px 0 14px;
+}
+.hero{
+  margin-bottom:14px;
+  padding:22px 20px;
+}
+@media(max-width:520px){
+  .stats{gap:8px;margin-bottom:20px}
+  .stat{min-height:58px;padding:10px 8px;border-radius:16px}
+  .stat b{font-size:22px}
+  .stat span{font-size:11px}
+  .trip-cover{min-height:210px}
+  .trip-city{font-size:34px}
+}
