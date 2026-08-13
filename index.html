@@ -20,10 +20,12 @@
 </div>
 
 <nav class="bottomnav">
-<button class="navbtn active" data-view="library">旅行库</button>
-<button class="navbtn" data-view="today">当天</button>
-<button class="navbtn" data-view="orders">订单</button>
-<button class="navbtn" data-view="tools">资料</button>
+<button class="navbtn active" data-view="library"><span class="nav-icon">⌂</span><span>旅行库</span></button>
+<button class="navbtn" data-view="today"><span class="nav-icon">◉</span><span>当天</span></button>
+<button class="navbtn" data-view="map"><span class="nav-icon">⌖</span><span>地图</span></button>
+<button class="navbtn" data-view="orders"><span class="nav-icon">▣</span><span>订单</span></button>
+<button class="navbtn" data-view="finance"><span class="nav-icon">¥</span><span>记账</span></button>
+<button class="navbtn" data-view="tools"><span class="nav-icon">☰</span><span>资料</span></button>
 </nav>
 
 <div class="modal" id="orderModal">
@@ -42,5 +44,7 @@
 </div>
 
 <script src="./app.js"></script>
+<script src="./finance.js"></script>
+<script src="./map.js"></script>
 </body>
 </html>

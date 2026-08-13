@@ -53,7 +53,7 @@ function temporal(day){
 }
 function renderHeader(){
   $('#brand').textContent=INDEX?.app?.name||'My Trips';
-  $('#brandSub').textContent=TRIP?`${TRIP.city} · ${TRIP.meta.subtitle}`:(INDEX?.app?.subtitle||'离线旅行攻略助手');
+  $('#brandSub').textContent=TRIP?(TRIP.meta.subtitle||`${TRIP.city}旅行助手`):(INDEX?.app?.subtitle||'离线旅行攻略助手');
   $('#statusPill').innerHTML=`<span class="dot" style="${navigator.onLine?'':'background:#a64035'}"></span>${navigator.onLine?'已联网':'离线可用'}`;
 }
 function setView(v){state.view=v;render()}
@@ -80,14 +80,17 @@ function normalizedTrip(t,imported=false){
 }
 function tripCardHTML(t){
   const city=t.city||'未命名城市',country=t.country||'',sl=stateLabel(t),theme=t.theme||'default';
-  const cl=checklistCount(t);
+  const cl=checklistCount(t),cover=t.coverImage||'';
+  const coverStyle=cover?`style="background-image:linear-gradient(180deg,rgba(9,19,15,.03) 2%,rgba(9,19,15,.12) 45%,rgba(9,19,15,.88) 100%),url('${cover}');background-position:${t.coverPosition||'center center'}"`:'';
   return `<section class="card trip-card">
-    <div class="trip-cover ${escapeHTML(theme)}"><div><div class="trip-country">${escapeHTML(country)}</div><div class="trip-city">${escapeHTML(city)}</div></div>
-      <div class="trip-cover-bottom"><div class="trip-dates">${t.start} → ${t.end}</div><span class="pill" style="background:rgba(255,255,255,.17);color:#fff">${t.dayCount} DAYS</span></div></div>
+    <div class="trip-cover ${escapeHTML(theme)} ${cover?'has-photo':''}" ${coverStyle}>
+      <div class="trip-cover-top"><div class="trip-country">${escapeHTML(country)}</div><span class="travel-edition">TRAVEL EDITION</span></div>
+      <div class="trip-cover-bottom"><div><div class="trip-city">${escapeHTML(city)}</div><div class="trip-dates">${t.start} → ${t.end}</div></div><span class="cover-days">${t.dayCount} DAYS</span></div>
+    </div>
     <div class="trip-body">
-      <div class="trip-statusline"><span class="pill ${sl.cls}">${sl.txt}</span>${cl.total?`<span class="hint">行前 ${cl.done}/${cl.total}</span>`:''}</div>
-      <p>${escapeHTML(t.route)}</p>
-      <div class="trip-actions"><button class="btn primary open-trip" data-id="${escapeHTML(t.id)}" data-imported="${t._imported?'1':'0'}">打开攻略</button>${t._imported?`<button class="btn danger delete-import" data-id="${escapeHTML(t.id)}">删除导入</button>`:''}</div>
+      <div class="trip-statusline"><span class="pill ${sl.cls}">${sl.txt}</span>${cl.total?`<span class="hint">行前准备 ${cl.done}/${cl.total}</span>`:''}</div>
+      <p class="trip-route-copy">${escapeHTML(t.route)}</p>
+      <div class="trip-actions"><button class="btn primary open-trip" data-id="${escapeHTML(t.id)}" data-imported="${t._imported?'1':'0'}">查看行程</button>${t._imported?`<button class="btn danger delete-import" data-id="${escapeHTML(t.id)}">删除导入</button>`:''}</div>
     </div>
   </section>`;
 }
@@ -114,6 +117,14 @@ function renderLibrary(){
     }catch(err){alert('攻略包格式不正确：需要 id、city、meta.start 和 days。')}
   });
 }
+function scenicHero(day){
+  if(!TRIP?.coverImage) return '';
+  return `<section class="scenic-hero" style="background-image:linear-gradient(180deg,rgba(7,16,13,.04) 0%,rgba(7,16,13,.15) 44%,rgba(7,16,13,.90) 100%),url('${TRIP.coverImage}');background-position:${TRIP.coverPosition||'center center'}">
+    <div class="scenic-top"><span>${escapeHTML(TRIP.country||'')}</span><span>DAY ${day.day} · ${day.label}</span></div>
+    <div class="scenic-copy"><div class="scenic-kicker">${escapeHTML(TRIP.city)} JOURNEY</div><h2>${escapeHTML(day.title)}</h2><p>${escapeHTML(day.route)}</p></div>
+  </section>`;
+}
+
 function smartCard(day){
   const t=temporal(day),done=completedCount(day),total=day.timeline.length;let main='',sub='',rLabel='',r='';
   if(t.mode==='before'){main=`距${TRIP.city}出发还有 ${t.days} 天`;sub=`第一天：${TRIP.days[0].label} · ${TRIP.days[0].title}`;rLabel='行程日期';r=`${TRIP.meta.start.slice(5)}–${TRIP.meta.end.slice(5)}`}
@@ -140,9 +151,10 @@ function goToday(){
 }
 function renderToday(){
   renderDayStrip(true);const d=TRIP.days[state.day],checks=loadChecks(),t=temporal(d),realDay=defaultDay();
-  $('#main').innerHTML=`<div class="quickrow"><button class="btn soft" id="goLibrary">← 旅行库</button><button class="btn ${state.day===realDay?'primary':'soft'}" id="goToday">◎ 回到今天</button><button class="btn soft" id="goChecklist">✓ 行前 Checklist</button></div>`+
-    smartCard(d)+`<section class="card hero"><span class="pill">${TRIP.city} · DAY ${d.day}</span><h2>${d.title}</h2><div class="route">${d.route}</div>
-    <div class="meta-grid"><div class="meta"><b>住宿</b><span>${d.hotel}</span></div><div class="meta"><b>交通</b><span>${d.transport}</span></div><div class="meta"><b>预订</b><span>${d.booking}</span></div><div class="meta"><b>时间点</b><span>${d.timeline.length} 个</span></div></div></section>
+  $('#main').innerHTML=`<div class="quickrow"><button class="btn soft" id="goLibrary">← 旅行库</button><button class="btn ${state.day===realDay?'primary':'soft'}" id="goToday">◎ 回到今天</button><button class="btn soft" id="goChecklist">✓ Checklist</button></div>`+
+    scenicHero(d)+smartCard(d)+`<section class="card day-detail-card">
+    <div class="day-detail-title"><span>DAY ${d.day} DETAILS</span><b>${d.hotel}</b></div>
+    <div class="meta-grid"><div class="meta"><b>交通安排</b><span>${d.transport}</span></div><div class="meta"><b>预订重点</b><span>${d.booking}</span></div><div class="meta"><b>今日时间点</b><span>${d.timeline.length} 个</span></div><div class="meta"><b>行程日期</b><span>${d.label}</span></div></div></section>
     <div class="notice"><b>备用方案</b>${d.backup}</div>${tomorrowCard()}
     <div class="section-head"><h3>当天时间轴</h3><span class="hint">点击圆圈标记完成</span></div><section class="card timeline" id="timeline"></section>
     <div class="section-head"><h3>地点与导航</h3><span class="hint">坐标可离线查看</span></div><section class="card" id="places"></section>`;

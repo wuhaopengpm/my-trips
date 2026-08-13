@@ -14,7 +14,9 @@
       "route": "南部海岸 · 佩妮达双线 · 乌布",
       "data": "./bali-2026-09.json",
       "status": "upcoming",
-      "theme": "tropical"
+      "theme": "tropical",
+      "coverImage": "./bali-kelingking.jpg",
+      "coverPosition": "center 54%"
     }
   ]
 }

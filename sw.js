@@ -1,12 +1,73 @@
-const CACHE='my-trips-v3-2-github-20260812';
-const CORE=["./", "./index.html", "./styles.css", "./app.js", "./trips.json", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./bali-2026-09.json"];
-self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting())));
-self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
-self.addEventListener('fetch',e=>{
-  if(e.request.method!=='GET')return;
-  const u=new URL(e.request.url);
-  if(u.origin!==self.location.origin)return;
-  e.respondWith(caches.match(e.request).then(hit=>hit||fetch(e.request).then(resp=>{
-    const copy=resp.clone();caches.open(CACHE).then(c=>c.put(e.request,copy));return resp;
-  }).catch(()=>caches.match('./index.html'))));
+const CACHE='my-trips-v3-5-visual-20260813';
+const CORE=[
+  './',
+  './index.html',
+  './styles.css',
+  './app.js',
+  './finance.js',
+  './map.js',
+  './trips.json',
+  './manifest.webmanifest',
+  './icon-192.png',
+  './icon-512.png',
+  './bali-2026-09.json',
+  './bali-kelingking.jpg'
+];
+
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE)
+      .then(cache => cache.addAll(CORE))
+      .then(() => self.skipWaiting())
+  );
+});
+
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys()
+      .then(keys => Promise.all(
+        keys.filter(key => key !== CACHE).map(key => caches.delete(key))
+      ))
+      .then(() => self.clients.claim())
+  );
+});
+
+self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET') return;
+
+  const url = new URL(event.request.url);
+  if (url.origin !== self.location.origin) return;
+
+  const isAppFile =
+    url.pathname.endsWith('/') ||
+    /\.(html|js|css|json|webmanifest)$/i.test(url.pathname);
+
+  if (isAppFile) {
+    // Online: get newest GitHub version first.
+    // Offline: fall back to the cached copy.
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          const copy = response.clone();
+          caches.open(CACHE).then(cache => cache.put(event.request, copy));
+          return response;
+        })
+        .catch(() =>
+          caches.match(event.request).then(hit => hit || caches.match('./index.html'))
+        )
+    );
+    return;
+  }
+
+  // Icons and other static assets can remain cache-first.
+  event.respondWith(
+    caches.match(event.request).then(hit =>
+      hit ||
+      fetch(event.request).then(response => {
+        const copy = response.clone();
+        caches.open(CACHE).then(cache => cache.put(event.request, copy));
+        return response;
+      })
+    )
+  );
 });

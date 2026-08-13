@@ -1,17 +1,17 @@
-# My Trips V3.2 — GitHub Pages 版
+# My Trips V3.5 — Visual Refresh
 
-## 本次升级
-- 旅行库自动排序：旅行中 → 即将出发 → 已结束
-- 城市卡显示出发倒计时
-- 巴厘岛卡片增加热带视觉
-- “回到今天”快捷按钮
-- 当天页面显示“明天提前准备”
-- 行前 Checklist，可打勾并保存
-- 订单截图点击全屏查看二维码
-- 订单可标记“重要”并自动置顶
-- 非旅行期间默认打开“旅行库”，不会每次自动跳入巴厘岛
+## 视觉升级
+- 巴厘岛旅行库卡片使用 Kelingking Beach 实景大图
+- 巴厘岛 Day 页面增加沉浸式景点封面
+- 旅行库改成“旅行杂志封面”风格
+- Smart Trip 改为深色高级信息卡，不再是整块亮绿色
+- 优化圆角、留白、阴影、按钮和字体层级
+- 底部导航改成图标 + 短标签
+- V3.3 记账、V3.4 地图等功能全部保留
 
-## 升级 GitHub
-如果已经部署 V3.1，只需用 V3.2 Patch 中的文件覆盖仓库同名文件并 Commit。
-
-GitHub Pages 会自动重新部署。
+## 图片授权
+Kelingking Beach 图片：
+- Author: Chainwit
+- Source: Wikimedia Commons
+- License: CC BY 4.0
+- Local asset: bali-kelingking.jpg

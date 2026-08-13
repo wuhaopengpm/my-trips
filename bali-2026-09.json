@@ -765,6 +765,11 @@
       "双人不含国际机票：约 IDR 25,400,000–38,900,000（手册规划约 CNY 11,300–17,300）。",
       "住宿 6 晚是最大波动项；悬崖酒店和度假酒店影响最大。",
       "建议单独保留机动金用于超时、临时改签和药品。"
+    ],
+    "图片与版权": [
+      "巴厘岛封面：Kelingking Beach (T-Rex Bay), Nusa Penida。",
+      "摄影：Chainwit；来源：Wikimedia Commons；许可：CC BY 4.0。",
+      "App 内图片已做裁切、压缩与暗色渐变叠加以适配移动端。"
     ]
   },
   "hotels": [
@@ -1011,5 +1016,29 @@
       "title": "充电宝 / 转换插头 / 防水袋",
       "note": "出发前最后一次检查随身电子设备。"
     }
-  ]
+  ],
+  "finance": {
+    "baseCurrency": "IDR",
+    "homeCurrency": "CNY",
+    "planningRate": 2250,
+    "rateLabel": "1 CNY = 2,250 IDR",
+    "budgetRange": {
+      "minIDR": 25400000,
+      "maxIDR": 38900000,
+      "minCNY": 11300,
+      "maxCNY": 17300
+    },
+    "categories": [
+      "住宿",
+      "交通",
+      "餐饮",
+      "门票/项目",
+      "购物",
+      "签证/税费",
+      "其他"
+    ]
+  },
+  "coverImage": "./bali-kelingking.jpg",
+  "coverPosition": "center 54%",
+  "coverCredit": "Kelingking Beach · Chainwit / Wikimedia Commons · CC BY 4.0"
 }
