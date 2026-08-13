@@ -1,4 +1,4 @@
-const CACHE='my-trips-v3-5-visual-20260813';
+const CACHE='my-trips-v3-5-1-visual-20260814';
 const CORE=[
   './',
   './index.html',
@@ -37,6 +37,20 @@ self.addEventListener('fetch', event => {
 
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
+
+  // V3.5.1 fix:
+  // Root path must always get the newest index.html.
+  // Prevent iOS Safari/PWA from returning an old cached entry page.
+  if (
+    url.pathname.endsWith('/my-trips/') ||
+    url.pathname.endsWith('/my-trips')
+  ) {
+    event.respondWith(
+      fetch('./index.html', { cache: 'no-store' })
+        .catch(() => caches.match('./index.html'))
+    );
+    return;
+  }
 
   const isAppFile =
     url.pathname.endsWith('/') ||
