@@ -1,8 +1,9 @@
-const CACHE='my-trips-v3-6-5-library-cover-20260814';
+const CACHE='my-trips-v3-7-0-20260825';
 const CORE=[
   './',
   './index.html',
   './styles.css',
+  './utils.js',
   './app.js',
   './finance.js',
   './map.js',
@@ -11,7 +12,10 @@ const CORE=[
   './icon-192.png',
   './icon-512.png',
   './bali-2026-09.json',
-  './bali-kelingking.jpg'
+  './trip-pack.schema.json',
+  './bali-kelingking-640.webp',
+  './bali-kelingking-1280.webp',
+  './bali-kelingking-fallback.jpg'
 ];
 
 self.addEventListener('install', event => {
@@ -32,26 +36,13 @@ self.addEventListener('activate', event => {
   );
 });
 
-// FORCE_UPDATE_MERGED
 self.addEventListener('fetch', event => {
-  const requestUrl = new URL(event.request.url);
-  if (
-    requestUrl.pathname.endsWith('/my-trips/') ||
-    requestUrl.pathname.endsWith('/my-trips/index.html') ||
-    requestUrl.pathname.endsWith('/my-trips/sw.js')
-  ) {
-    event.respondWith(
-      fetch(event.request, {cache:'no-store'})
-        .catch(() => caches.match(event.request))
-    );
-    return;
-  }
   if (event.request.method !== 'GET') return;
 
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
 
-  const isAppFile =
+  const isAppFile = event.request.mode === 'navigate' ||
     url.pathname.endsWith('/') ||
     /\.(html|js|css|json|webmanifest)$/i.test(url.pathname);
 
@@ -59,14 +50,14 @@ self.addEventListener('fetch', event => {
     // Online: get newest GitHub version first.
     // Offline: fall back to the cached copy.
     event.respondWith(
-      fetch(event.request)
+      fetch(event.request,{cache:event.request.mode==='navigate'?'no-store':'default'})
         .then(response => {
           const copy = response.clone();
           caches.open(CACHE).then(cache => cache.put(event.request, copy));
           return response;
         })
         .catch(() =>
-          caches.match(event.request).then(hit => hit || caches.match('./index.html'))
+          caches.match(event.request).then(hit => hit || caches.match(new URL('./index.html',self.registration.scope)))
         )
     );
     return;

@@ -1078,9 +1078,11 @@
       "其他"
     ]
   },
-  "coverImage": "./bali-kelingking.jpg",
+  "coverImage": "./bali-kelingking-fallback.jpg",
+  "coverImageSrcset": "./bali-kelingking-640.webp 640w, ./bali-kelingking-1280.webp 1280w",
+  "coverImageSizes": "(max-width: 780px) 100vw, 780px",
   "coverPosition": "center 62%",
   "coverCredit": "Kelingking Beach Sunset",
-  "dayCoverImage": "./bali-kelingking.jpg",
+  "dayCoverImage": "./bali-kelingking-fallback.jpg",
   "dayCoverPosition": "center 62%"
 }

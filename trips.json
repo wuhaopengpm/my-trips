@@ -15,8 +15,10 @@
       "data": "./bali-2026-09.json",
       "status": "upcoming",
       "theme": "tropical",
-      "coverImage": "./bali-kelingking.jpg",
-      "coverPosition": "center 54%"
+      "coverImage": "./bali-kelingking-fallback.jpg",
+      "coverImageSrcset": "./bali-kelingking-640.webp 640w, ./bali-kelingking-1280.webp 1280w",
+      "coverImageSizes": "(max-width: 780px) 100vw, 780px",
+      "coverPosition": "center 62%"
     }
   ]
 }
