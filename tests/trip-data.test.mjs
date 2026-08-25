@@ -43,3 +43,29 @@ test('validates all repository trip packs and cached assets', () => {
   assert.deepEqual(validateRepository(ROOT), []);
   assert.doesNotThrow(()=>JSON.parse(fs.readFileSync(path.join(ROOT,'trip-pack.schema.json'),'utf8')));
 });
+
+test('Bali itinerary follows the confirmed September route', () => {
+  const trip=JSON.parse(fs.readFileSync(path.join(ROOT,'bali-2026-09.json'),'utf8'));
+  const day=number=>trip.days.find(item=>item.day===number);
+  assert.equal(day(1).hotel,'Metland Seva Seminyak');
+  assert.match(day(1).route,/Metland Seva.*水明漾冲浪/);
+  assert.equal(day(2).hotel,'Gravity Eco Boutique Hotel');
+  assert.deepEqual(day(2).places.map(item=>item[0]),[
+    'Gravity Eco Boutique Hotel','Timbis Paragliding','Melasti Beach','Uluwatu Temple','Kecak Uluwatu'
+  ]);
+  assert.match(day(3).route,/Gravity.*Sanur.*Banjar Nyuh/);
+  assert.match(day(5).booking,/上午船/);
+  assert.match(day(6).route,/ATV.*Tibumana Waterfall.*机场酒店/);
+  assert.match(day(6).transport,/17:00/);
+  assert.equal(day(7).places[0][0],'机场酒店');
+  assert.ok(day(7).timeline.every(item=>item[0]>='05:00'));
+  assert.deepEqual(trip.hotels.map(item=>item.area),['水明漾','乌鲁瓦图','佩妮达','乌布','机场']);
+});
+
+test('Bali orders cover the changed activities and stays', () => {
+  const trip=JSON.parse(fs.readFileSync(path.join(ROOT,'bali-2026-09.json'),'utf8'));
+  const ids=new Set(trip.orderTemplates.map(item=>item.id));
+  for(const id of ['surf-seminyak','hotel-gravity','atv-ubud','hotel-airport','transfer-airport-hotel']){
+    assert.ok(ids.has(id),`missing order template ${id}`);
+  }
+});
