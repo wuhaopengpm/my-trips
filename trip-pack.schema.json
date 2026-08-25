@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/my-trips/trip-pack.schema.json",
+  "title": "My Trips Trip Pack",
+  "type": "object",
+  "required": ["id", "city", "country", "meta", "days"],
+  "properties": {
+    "id": {"type": "string", "minLength": 1},
+    "city": {"type": "string", "minLength": 1},
+    "country": {"type": "string"},
+    "theme": {"type": "string"},
+    "coverImage": {"type": "string"},
+    "coverImageSrcset": {"type": "string"},
+    "coverImageSizes": {"type": "string"},
+    "coverPosition": {"type": "string"},
+    "coverCredit": {"type": "string"},
+    "meta": {
+      "type": "object",
+      "required": ["title", "subtitle", "start", "end", "route"],
+      "properties": {
+        "title": {"type": "string"}, "subtitle": {"type": "string"},
+        "start": {"type": "string", "format": "date"},
+        "end": {"type": "string", "format": "date"}, "route": {"type": "string"}
+      }
+    },
+    "days": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["day", "date", "label", "title", "route", "hotel", "transport", "booking", "backup", "timeline", "places"],
+        "properties": {
+          "day": {"type": "integer", "minimum": 1}, "date": {"type": "string", "format": "date"},
+          "label": {"type": "string"}, "title": {"type": "string"}, "route": {"type": "string"},
+          "hotel": {"type": "string"}, "transport": {"type": "string"}, "booking": {"type": "string"}, "backup": {"type": "string"},
+          "timeline": {"type": "array", "items": {"type": "array", "prefixItems": [{"type":"string","pattern":"^(?:[01]\\d|2[0-3]):[0-5]\\d$"},{"type":"string"},{"type":"string"}], "minItems": 3, "maxItems": 3}},
+          "places": {"type": "array", "items": {"type": "array", "prefixItems": [{"type":"string"},{"type":"number","minimum":-90,"maximum":90},{"type":"number","minimum":-180,"maximum":180}], "minItems": 3, "maxItems": 3}}
+        }
+      }
+    },
+    "hotels": {"type": "array"}, "orderTemplates": {"type": "array"},
+    "checklist": {"type": "array"}, "guides": {"type": "object"},
+    "finance": {"type": "object"}, "emergency": {"type": "object"}
+  }
+}

@@ -1,71 +1,51 @@
-# Trip Pack V3.2 结构
+# Trip Pack V3.7 结构
 
-以后每个城市/行程仍然是一个独立 JSON 文件。
+每趟旅行使用一个独立 JSON 文件，并由 `trips.json` 引用。正式机器可读规范见 `trip-pack.schema.json`。
 
-新增支持字段：
+## 根字段
+
+- `id`、`city`、`country`：旅行标识与目的地。
+- `meta`：标题、副标题、开始/结束日期和路线摘要。
+- `days`：按日期排序的每日行程。
+- `hotels`、`orderTemplates`、`checklist`、`guides`：酒店候选、订单槽位、行前准备和资料。
+- `finance`、`emergency`：预算配置和应急信息。
+- `theme`、`coverImage`、`coverPosition`、`coverCredit`：主题与封面。
+
+## 响应式封面
+
+旧攻略只写 `coverImage` 仍然兼容。新攻略可增加：
 
 ```json
 {
-  "id": "tokyo-2027-04",
-  "city": "东京",
-  "country": "日本",
-  "theme": "default",
-  "meta": {
-    "title": "Tokyo 6-Day",
-    "subtitle": "东京 6 天旅行助手",
-    "start": "2027-04-01",
-    "end": "2027-04-06",
-    "route": "新宿 · 浅草 · 银座 · 镰仓"
-  },
-  "checklist": [
-    {
-      "id": "hotel",
-      "group": "住宿",
-      "title": "确认酒店",
-      "note": "保存确认单"
-    }
-  ],
-  "days": []
+  "coverImage": "./cover-fallback.jpg",
+  "coverImageSrcset": "./cover-640.webp 640w, ./cover-1280.webp 1280w",
+  "coverImageSizes": "(max-width: 780px) 100vw, 780px",
+  "coverPosition": "center 62%"
 }
 ```
 
-## V3.2 新功能
-- 旅行库自动按：旅行中 → 即将出发 → 已结束排序
-- 出发倒计时
-- 行前 Checklist
-- “回到今天”
-- 明日准备
-- 订单二维码全屏
-- 重要订单置顶
+## Day
 
-## GitHub 内置新城市
-仍然只需要：
-1. 上传 `<city>.json`
-2. 更新 `trips.json`
-3. 更新 `sw.js` 缓存清单
+每个 Day 必须包含 `day`、`date`、`label`、`title`、`route`、`hotel`、`transport`、`booking`、`backup`、`timeline` 和 `places`。
 
-后续可以直接让 ChatGPT 为你生成“城市升级补丁包”，无需自己编辑 JSON。
-
-
-## V3.3 Finance
 ```json
-"finance": {
-  "baseCurrency": "IDR",
-  "homeCurrency": "CNY",
-  "planningRate": 2250,
-  "rateLabel": "1 CNY = 2,250 IDR",
-  "budgetRange": {"minIDR":25400000,"maxIDR":38900000,"minCNY":11300,"maxCNY":17300}
+{
+  "day": 1,
+  "date": "2027-01-01",
+  "label": "1月1日",
+  "title": "抵达",
+  "route": "机场 → 酒店",
+  "hotel": "酒店",
+  "transport": "接机",
+  "booking": "保存订单",
+  "backup": "航班延误时顺延",
+  "timeline": [["09:00", "抵达", "说明"]],
+  "places": [["Airport", 0, 0]]
 }
 ```
 
+`places` 的顺序就是离线路线连接顺序；纬度范围为 -90–90，经度范围为 -180–180。
 
-## V3.4 地图要求
-无需新增专门地图字段。地图直接使用每天已有的：
+## 校验与发布
 
-```json
-"places": [
-  ["Place Name", -8.74817, 115.16717]
-]
-```
-
-经纬度必须是真实坐标。每个 Day 的 `places` 顺序即当天路线连接顺序。
+运行 `node scripts/validate-trip-data.mjs`。新增内置城市时需要同时更新 `trips.json` 和 `sw.js` 的预缓存资源；导入本机的攻略包无需修改 Service Worker。

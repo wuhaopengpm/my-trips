@@ -2,6 +2,12 @@
   "id": "city-yyyy-mm",
   "city": "城市名",
   "country": "国家",
+  "theme": "default",
+  "coverImage": "./cover.jpg",
+  "coverImageSrcset": "./cover-640.webp 640w, ./cover-1280.webp 1280w",
+  "coverImageSizes": "(max-width: 780px) 100vw, 780px",
+  "coverPosition": "center center",
+  "coverCredit": "图片来源与授权",
   "meta": {
     "title": "City Trip",
     "subtitle": "离线旅行助手",
@@ -9,62 +15,27 @@
     "end": "2027-01-03",
     "route": "路线摘要"
   },
-  "days": [
-    {
-      "day": 1,
-      "date": "2027-01-01",
-      "label": "1月1日",
-      "title": "Day 1 标题",
-      "route": "A → B",
-      "hotel": "酒店",
-      "transport": "交通",
-      "booking": "预订",
-      "backup": "备用方案",
-      "timeline": [
-        [
-          "09:00",
-          "第一站",
-          "说明"
-        ]
-      ],
-      "places": [
-        [
-          "Place",
-          0,
-          0
-        ]
-      ]
-    }
-  ],
-  "hotels": [],
-  "orderTemplates": [],
-  "guides": {},
-  "emergency": {
-    "general": "",
-    "note": ""
-  },
-  "theme": "default",
-  "checklist": [
-    {
-      "id": "example",
-      "group": "出发前",
-      "title": "示例待办",
-      "note": "这里填写说明"
-    }
-  ],
+  "days": [{
+    "day": 1,
+    "date": "2027-01-01",
+    "label": "1月1日",
+    "title": "Day 1 标题",
+    "route": "A → B",
+    "hotel": "酒店",
+    "transport": "交通",
+    "booking": "预订",
+    "backup": "备用方案",
+    "timeline": [["09:00", "第一站", "说明"]],
+    "places": [["Place", 0, 0]]
+  }],
+  "hotels": [{"area":"区域","night":"1晚","choices":[{"name":"酒店","tag":"首选","why":"原因","note":"提醒"}]}],
+  "orderTemplates": [{"id":"hotel","type":"酒店","title":"酒店订单"}],
+  "guides": {"行李清单":["护照"]},
+  "emergency": {"general":"112","note":"提前保存保险和领馆电话"},
+  "checklist": [{"id":"passport","group":"出发前","title":"确认护照","note":"检查有效期"}],
   "finance": {
-    "baseCurrency": "LOCAL",
-    "homeCurrency": "CNY",
-    "planningRate": 1,
-    "rateLabel": "1 CNY = ? LOCAL",
-    "budgetRange": {},
-    "categories": [
-      "住宿",
-      "交通",
-      "餐饮",
-      "门票/项目",
-      "购物",
-      "其他"
-    ]
+    "baseCurrency": "LOCAL", "homeCurrency": "CNY", "planningRate": 1,
+    "rateLabel": "1 CNY = ? LOCAL", "budgetRange": {},
+    "categories": ["住宿", "交通", "餐饮", "门票/项目", "购物", "其他"]
   }
 }
