@@ -25,11 +25,13 @@ button,input,textarea,select{font:inherit}button,a{-webkit-tap-highlight-color:t
 .section-head h3{font-size:18px;margin:0}.hint{font-size:11px;color:var(--muted)}
 .trip-card{padding:0;overflow:hidden}
 .trip-cover{min-height:145px;padding:20px;display:flex;flex-direction:column;justify-content:space-between;color:#fff;position:relative;overflow:hidden;background:linear-gradient(135deg,#3c6658,#264b40)}
+.cover-media{position:absolute;inset:0;width:100%;height:100%;z-index:0}.cover-media img{width:100%;height:100%;display:block;object-fit:cover;object-position:var(--cover-position,center center)}
+.cover-overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(9,19,15,.03) 2%,rgba(9,19,15,.12) 45%,rgba(9,19,15,.88) 100%)}
 .trip-cover.tropical{background:linear-gradient(135deg,#087e68 0,#089f83 48%,#1777a2 100%)}
 .trip-cover.tropical:before,.trip-cover.tropical:after{content:"";position:absolute;border-radius:999px;background:rgba(255,255,255,.1)}
 .trip-cover.tropical:before{width:170px;height:170px;right:-45px;top:-70px}
 .trip-cover.tropical:after{width:110px;height:110px;right:70px;bottom:-70px}
-.trip-cover > *{position:relative;z-index:1}
+.trip-cover > *:not(.cover-media):not(.cover-overlay){position:relative;z-index:2}
 .trip-country{font-size:11px;letter-spacing:.09em;text-transform:uppercase;opacity:.8;font-weight:800}
 .trip-city{font-size:30px;font-weight:800;letter-spacing:-.04em;margin-top:4px}
 .trip-cover-bottom{display:flex;justify-content:space-between;align-items:end;gap:12px}
@@ -170,7 +172,9 @@ body{background:radial-gradient(circle at 18% 0%,rgba(224,236,229,.75),transpare
 .trip-dates{margin-top:9px;color:rgba(255,255,255,.9);font-weight:600}
 .cover-days{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:7px 11px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);backdrop-filter:blur(10px);color:#fff;font-size:11px;font-weight:760}
 .trip-body{padding:17px 18px 18px}.trip-route-copy{font-size:14px!important;color:#535d57!important;font-weight:580}.trip-actions .btn.primary{padding:10px 16px}
-.scenic-hero{position:relative;min-height:360px;background-size:cover;border-radius:28px;overflow:hidden;margin-bottom:13px;box-shadow:0 20px 60px rgba(14,34,25,.18);color:#fff;padding:21px;display:flex;flex-direction:column;justify-content:space-between}
+.scenic-hero{position:relative;min-height:360px;background-size:cover;border-radius:16px;overflow:hidden;margin-bottom:13px;box-shadow:0 8px 24px rgba(14,34,25,.18);color:#fff;padding:21px;display:flex;flex-direction:column;justify-content:space-between}
+.scenic-hero .cover-overlay{background:linear-gradient(180deg,rgba(7,16,13,.04) 0%,rgba(7,16,13,.15) 44%,rgba(7,16,13,.90) 100%)}
+.scenic-hero > *:not(.cover-media):not(.cover-overlay){position:relative;z-index:2}
 .scenic-top{display:flex;justify-content:space-between;gap:10px;font-size:10px;letter-spacing:.11em;font-weight:750;text-transform:uppercase;color:rgba(255,255,255,.9)}
 .scenic-top span:last-child{border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:5px 8px;background:rgba(0,0,0,.12);backdrop-filter:blur(8px)}
 .scenic-copy{max-width:610px}.scenic-kicker{font-size:10px;letter-spacing:.14em;font-weight:780;color:rgba(255,255,255,.72)}
@@ -253,6 +257,14 @@ body{background:radial-gradient(circle at 18% 0%,rgba(224,236,229,.75),transpare
     background-position:center 72% !important;
   }
 }
+
+/* V3.7 mobile performance and accessibility */
+.card{border-radius:16px;box-shadow:0 6px 14px rgba(20,38,30,.07)}
+.trip-cover{border-radius:16px 16px 0 0}
+.smart,.notice{border-radius:16px}
+.tomorrow{border:1px solid #b9d7cb;background:#fbfefc}
+.btn:focus-visible,.navbtn:focus-visible,.daybtn:focus-visible,.filter:focus-visible,.check:focus-visible,.map-check:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid rgba(31,108,84,.3);outline-offset:2px}
+.empty-state{padding:16px 0;text-align:center}
 
 /* Compact statistic cards */
 .stats-grid,.stat-grid{

@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-<!-- v3.6.4-merged -->
+<!-- v3.7.0 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#eef3ef">
@@ -29,7 +29,7 @@
 <button class="navbtn" data-view="tools"><span class="nav-icon">☰</span><span>资料</span></button>
 </nav>
 
-<div class="modal" id="orderModal">
+<div class="modal" id="orderModal" role="dialog" aria-modal="true" aria-labelledby="orderSheetTitle">
   <div class="sheet">
     <div style="display:flex;justify-content:space-between;align-items:center"><h3 id="orderSheetTitle">添加凭证</h3><button class="btn" id="orderClose">关闭</button></div>
     <div id="orderCurrent"></div>
@@ -39,11 +39,12 @@
   </div>
 </div>
 
-<div class="viewer" id="imageViewer">
+<div class="viewer" id="imageViewer" role="dialog" aria-modal="true" aria-labelledby="viewerTitle">
   <div class="viewer-bar"><div class="viewer-title" id="viewerTitle">订单</div><button class="viewer-close" id="viewerClose">关闭</button></div>
   <img id="viewerImg" alt="订单二维码全屏查看">
 </div>
 
+<script src="./utils.js"></script>
 <script src="./app.js"></script>
 <script src="./finance.js"></script>
 <script src="./map.js"></script>

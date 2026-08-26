@@ -11,12 +11,14 @@
       "start": "2026-09-11",
       "end": "2026-09-17",
       "days": 7,
-      "route": "南部海岸 · 佩妮达双线 · 乌布",
+      "route": "水明漾冲浪 · 乌鲁瓦图骑行 · 佩妮达双线 · 乌布ATV",
       "data": "./bali-2026-09.json",
       "status": "upcoming",
       "theme": "tropical",
-      "coverImage": "./bali-kelingking.jpg",
-      "coverPosition": "center 54%"
+      "coverImage": "./bali-kelingking-fallback.jpg",
+      "coverImageSrcset": "./bali-kelingking-640.webp 640w, ./bali-kelingking-1280.webp 1280w",
+      "coverImageSizes": "(max-width: 780px) 100vw, 780px",
+      "coverPosition": "center 62%"
     }
   ]
 }

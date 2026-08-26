@@ -185,7 +185,7 @@
       <div class="section-head"><h3>按天筛选</h3><span class="hint">全部 / Day 1–Day ${TRIP.days.length}</span></div>
       <div class="map-filter" id="mapFilter">
         <button class="filter ${dayIndex<0?'active':''}" data-mapday="-1">全部</button>
-        ${TRIP.days.map((d,i)=>`<button class="filter ${dayIndex===i?'active':''}" data-mapday="${i}">D${d.day} · ${d.label.replace('月','/').replace('日','')}</button>`).join('')}
+        ${TRIP.days.map((d,i)=>`<button class="filter ${dayIndex===i?'active':''}" data-mapday="${i}">D${escapeHTML(d.day)} · ${escapeHTML(d.label.replace('月','/').replace('日',''))}</button>`).join('')}
       </div>
 
       <section class="card map-card">
