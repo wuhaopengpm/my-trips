@@ -1,5 +1,7 @@
 const test=require('node:test');
 const assert=require('node:assert/strict');
+const path=require('node:path');
+const fs=require('node:fs');
 const {
   validMapPoint,
   googlePlaceUrl,
@@ -68,4 +70,21 @@ test('uses the real map only when online, Leaflet exists and points exist',()=>{
   assert.equal(shouldUseRealMap({online:false,leafletAvailable:true,pointCount:2}),false);
   assert.equal(shouldUseRealMap({online:true,leafletAvailable:false,pointCount:2}),false);
   assert.equal(shouldUseRealMap({online:true,leafletAvailable:true,pointCount:0}),false);
+});
+
+test('keeps the confirmed Bali Day 2 order in a Google Maps route',()=>{
+  const trip=JSON.parse(fs.readFileSync(path.join(__dirname,'..','bali-2026-09.json'),'utf8'));
+  const points=pointsForScope(trip.days,1);
+  assert.deepEqual(points.map(point=>point.name),[
+    'Gravity Eco Boutique Hotel',
+    'Timbis Paragliding',
+    'Melasti Beach',
+    'Uluwatu Temple',
+    'Kecak Uluwatu'
+  ]);
+
+  const url=new URL(googleDirectionsUrl(points));
+  assert.equal(url.searchParams.get('origin'),'-8.8226,115.1285');
+  assert.equal(url.searchParams.get('waypoints'),'-8.8355,115.1779|-8.8491,115.1629|-8.8291,115.0849');
+  assert.equal(url.searchParams.get('destination'),'-8.8296,115.085');
 });

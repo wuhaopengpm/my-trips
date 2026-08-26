@@ -4,8 +4,9 @@
   root.MyTripsMapUtils=api;
 })(typeof globalThis!=='undefined'?globalThis:this,function(){
   function validMapPoint(place){
-    if(!Array.isArray(place)||place.length<3)return null;
-    const name=String(place[0]??'').trim(),lat=Number(place[1]),lng=Number(place[2]);
+    const values=Array.isArray(place)?place:[place?.name,place?.lat,place?.lng];
+    if(values.length<3)return null;
+    const name=String(values[0]??'').trim(),lat=Number(values[1]),lng=Number(values[2]);
     if(!name||!Number.isFinite(lat)||lat < -90||lat > 90||lng < -180||lng > 180)return null;
     return{name,lat,lng};
   }

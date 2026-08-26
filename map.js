@@ -2,6 +2,8 @@
 // My Trips V3.4 — offline route map + check-ins
 (function(){
   const previousRender = render;
+  const {googlePlaceUrl,googleDirectionsUrl,pointsForScope,routesForScope,shouldUseRealMap}=MyTripsMapUtils;
+  let leafletMap=null,tileErrors=0;
 
   render = function(){
     if(state.view === 'map'){
@@ -10,8 +12,78 @@
       if(!TRIP){ state.view='library'; return previousRender(); }
       return renderTripMap();
     }
+    destroyRealMap();
     return previousRender();
   };
+
+  function destroyRealMap(){
+    if(leafletMap)leafletMap.remove();
+    leafletMap=null;
+    tileErrors=0;
+  }
+
+  function showMapFallback(message='真实地图需要网络，当前显示离线路线示意图。'){
+    destroyRealMap();
+    const real=$('#realMap'),fallback=$('#mapFallback'),status=$('#mapStatus');
+    if(real)real.hidden=true;
+    if(fallback)fallback.hidden=false;
+    if(!status)return;
+    status.innerHTML=`<span>${escapeHTML(message)}</span>${navigator.onLine?'<button class="btn soft" id="retryRealMap" type="button">重试真实地图</button>':''}`;
+    status.hidden=false;
+    $('#retryRealMap')?.addEventListener('click',()=>initializeRealMap(selectedDay()));
+  }
+
+  function initializeRealMap(dayIndex){
+    destroyRealMap();
+    const points=pointsForScope(TRIP.days,dayIndex),routes=routesForScope(TRIP.days,dayIndex);
+    if(!shouldUseRealMap({online:navigator.onLine,leafletAvailable:!!window.L,pointCount:points.length})){
+      showMapFallback();
+      return;
+    }
+
+    const real=$('#realMap'),fallback=$('#mapFallback'),status=$('#mapStatus');
+    if(!real)return;
+    real.hidden=false;
+    if(fallback)fallback.hidden=true;
+    if(status)status.hidden=true;
+
+    leafletMap=L.map(real,{scrollWheelZoom:false});
+    const tiles=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+      maxZoom:19,
+      attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>'
+    });
+    let failed=false;
+    tiles.on('tileerror',()=>{
+      tileErrors+=1;
+      if(tileErrors>=3&&!failed){
+        failed=true;
+        showMapFallback('地图底图暂时无法加载，当前显示离线路线示意图。');
+      }
+    });
+    tiles.addTo(leafletMap);
+
+    routes.forEach(route=>{
+      L.polyline(route.points.map(point=>[point.lat,point.lng]),{
+        color:dayColor(TRIP.days[route.dayIndex].day),weight:4,opacity:.78,interactive:false
+      }).addTo(leafletMap);
+    });
+
+    points.forEach((point,index)=>{
+      const number=dayIndex<0?index+1:point.placeIndex+1;
+      const icon=L.divIcon({
+        className:'map-number-icon-wrap',
+        html:`<span class="map-number-icon" style="--marker-color:${dayColor(point.day)}">${number}</span>`,
+        iconSize:[30,30],iconAnchor:[15,15],popupAnchor:[0,-17]
+      });
+      const marker=L.marker([point.lat,point.lng],{icon,title:point.name,alt:point.name,keyboard:true}).addTo(leafletMap);
+      marker.getElement()?.setAttribute('aria-label',`${number}. ${point.name}`);
+      marker.bindPopup(`<div class="map-popup"><b>${escapeHTML(point.name)}</b><span>Day ${escapeHTML(point.day)}</span><a href="${googlePlaceUrl(point)}" target="_blank" rel="noopener">在 Google Maps 打开</a></div>`);
+    });
+
+    if(points.length===1)leafletMap.setView([points[0].lat,points[0].lng],13);
+    else leafletMap.fitBounds(points.map(point=>[point.lat,point.lng]),{padding:[28,28],maxZoom:14});
+    requestAnimationFrame(()=>leafletMap?.invalidateSize());
+  }
 
   function checkinKey(){ return `checkins:${TRIP?.id||'none'}`; }
   function loadCheckins(){
@@ -154,7 +226,7 @@
         </div>
         <div class="map-place-actions">
           <a class="btn" target="_blank" rel="noopener" href="https://maps.apple.com/?q=${encodeURIComponent(p.name)}&ll=${p.lat},${p.lng}">Apple</a>
-          <a class="btn" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}">Google</a>
+          <a class="btn" target="_blank" rel="noopener" href="${googlePlaceUrl(p)}">Google</a>
         </div>
       </div>`;
     }).join('');
@@ -167,14 +239,17 @@
   }
 
   window.renderTripMap=function(){
+    destroyRealMap();
     renderDayStrip(false);
     const dayIndex=selectedDay();
     const st=stats();
+    const scopedPoints=pointsForScope(TRIP.days,dayIndex);
+    const directionsUrl=dayIndex>=0?googleDirectionsUrl(scopedPoints):'';
     $('#main').innerHTML=`
       <section class="card hero map-hero">
-        <span class="pill">${escapeHTML(TRIP.city)} · OFFLINE MAP</span>
+        <span class="pill">${escapeHTML(TRIP.city)} · REAL MAP</span>
         <h2>旅行路线地图</h2>
-        <div class="route">基于攻略中真实经纬度生成的离线路线示意图。它不加载在线地图底图，所以无网络也能查看地点相对位置和每天路线；实际导航仍建议点击 Apple / Google Maps。</div>
+        <div class="route">在线查看真实地图底图和景点顺序；断网时自动切换为离线路线示意图。地点和当天路线都可直接交给 Google Maps 导航。</div>
         <div class="map-stat-grid">
           <div><b>${st.days}</b><span>旅行天数</span></div>
           <div><b>${st.places}</b><span>地图地点</span></div>
@@ -189,13 +264,19 @@
       </div>
 
       <section class="card map-card">
-        ${routeSvg(dayIndex)}
+        <div id="realMap" class="real-map" role="region" aria-label="${escapeHTML(TRIP.city)}旅行路线地图"></div>
+        <div id="mapFallback" class="map-fallback" hidden>${routeSvg(dayIndex)}</div>
+        <div id="mapStatus" class="map-status" role="status" hidden></div>
+        <p class="map-caption">地图连线表示景点顺序；实际道路以 Google Maps 为准。</p>
+        ${directionsUrl?`<div class="map-route-action"><a class="btn primary" href="${directionsUrl}" target="_blank" rel="noopener">在 Google Maps 查看当天路线</a></div>`:''}
         <div class="map-legend">${routeSummary(dayIndex)}</div>
       </section>
 
       <div class="section-head"><h3>${dayIndex<0?'全部地点':'Day '+TRIP.days[dayIndex].day+' 地点'}</h3><span class="hint">点圆圈打卡</span></div>
       <section class="card map-place-list">${renderPlaceList(dayIndex)}</section>
     `;
+
+    initializeRealMap(dayIndex);
 
     $$('#mapFilter [data-mapday]').forEach(b=>b.addEventListener('click',()=>{
       setSelectedDay(Number(b.dataset.mapday));
