@@ -1,22 +1,5 @@
-const CACHE='my-trips-v3-7-0-20260825';
-const CORE=[
-  './',
-  './index.html',
-  './styles.css',
-  './utils.js',
-  './app.js',
-  './finance.js',
-  './map.js',
-  './trips.json',
-  './manifest.webmanifest',
-  './icon-192.png',
-  './icon-512.png',
-  './bali-2026-09.json',
-  './trip-pack.schema.json',
-  './bali-kelingking-640.webp',
-  './bali-kelingking-1280.webp',
-  './bali-kelingking-fallback.jpg'
-];
+importScripts('./offline-assets.js');
+const {CACHE,CORE}=self.MY_TRIPS_OFFLINE;
 
 self.addEventListener('install', event => {
   event.waitUntil(
