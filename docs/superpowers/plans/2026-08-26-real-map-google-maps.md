@@ -235,7 +235,7 @@ Expected: FAIL because `offline-assets.js`, `map-utils.js` integration, and vend
 
 - [ ] **Step 3: Download and copy the exact Leaflet 1.9.4 distribution**
 
-Download `https://github.com/Leaflet/Leaflet/archive/refs/tags/v1.9.4.tar.gz` into a temporary directory, inspect the archive, and copy only `dist/leaflet.css`, `dist/leaflet.js`, `dist/images/*`, and `LICENSE` into `vendor/leaflet/`. Preserve upstream bytes and filenames. Do not commit the archive or temporary directory.
+Download the official release asset `https://github.com/Leaflet/Leaflet/releases/download/v1.9.4/leaflet.zip` and the matching tag archive `https://github.com/Leaflet/Leaflet/archive/refs/tags/v1.9.4.tar.gz` into a temporary directory. Copy `leaflet.css`, `leaflet.js`, and `images/*` from the release ZIP, plus `LICENSE` from the tag archive, into `vendor/leaflet/`. Preserve upstream content and filenames, normalizing text files to LF for repository consistency. Do not commit either archive or the temporary directory.
 
 Verify version and license before continuing:
 
